@@ -43,7 +43,7 @@
         <br>
         <button type="submit" id="submitButton">Convert</button>
 
-        <!-- Vùng hiển thị lỗi: rỗng/ẩn khi không có lỗi, không ảnh hưởng layout gốc -->
+        <!-- Error message container: hidden when there are no errors, preserving the original layout -->
         <div id="errorMsg" style="display:none; color:#c0392b; margin-top:10px;"></div>
     </form>
 </div>
@@ -91,9 +91,9 @@
         });
     });
 
-    // Kiểm tra PDF bằng cả MIME type LẪN đuôi file, vì một số trình duyệt/OS
-    // không gán đúng type "application/pdf" khi kéo-thả, dẫn tới file PDF
-    // hợp lệ bị lọc bỏ âm thầm mà không có cảnh báo gì.
+    // Check PDFs using both the MIME type and the file extension. Some
+    // browsers/OSes fail to set the correct "application/pdf" MIME type during
+    // drag-and-drop, causing valid PDF files to be rejected without warning.
     function isPdfFile(file) {
         return file.type === 'application/pdf' ||
                file.name.toLowerCase().endsWith('.pdf');
@@ -174,8 +174,9 @@
         errorMsgDiv.style.display = 'none';
     }
 
-    // Lấy tên file gốc từ header Content-Disposition, hỗ trợ cả tên file
-    // có dấu tiếng Việt (dạng filename*=UTF-8''...) lẫn tên file ASCII thường.
+    // Extract the original filename from the Content-Disposition header,
+    // supporting both Vietnamese (UTF-8 encoded, filename*=UTF-8''...) and
+    // standard ASCII filenames.
     function parseFilename(disposition) {
         if (!disposition) return null;
         const utf8Match = disposition.match(/filename\*=UTF-8''([^;]+)/i);
@@ -190,10 +191,11 @@
         return asciiMatch ? asciiMatch[1] : null;
     }
 
-    // Submit bằng fetch thay vì để trình duyệt điều hướng trực tiếp:
-    // - Thành công: nhận file trả về, tự động tải xuống, KHÔNG rời trang.
-    // - Lỗi (400/413/500...): hiện thông báo lỗi ngay trên trang thay vì
-    //   trình duyệt bị điều hướng sang một trang JSON trần trụi.
+    // Submit the form using fetch instead of allowing the browser to navigate:
+    // - On success: receive the generated file and download it automatically
+    //   without leaving the current page.
+    // - On error (400/413/500, etc.): display the error message on the page
+    //   instead of redirecting the user to a raw JSON response.
     uploadForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         clearError();
@@ -220,7 +222,7 @@
                     const data = await response.json();
                     if (data && data.error) message = data.error;
                 } catch (_) {
-                    // response không phải JSON, giữ message mặc định
+                    // response is not JSON, keep the default message
                 }
                 showError(message);
                 return;

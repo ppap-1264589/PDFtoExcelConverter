@@ -35,7 +35,6 @@ Output will be in: `ConverterApp\dist\PDFtoExcelConverter.exe\`
 
 Create or add an icon file:
 - Place `icon.ico` in `ConverterApp\static\`
-- Or remove the `SetupIconFile` line from `installer.iss`
 
 ## Output Files
 
@@ -45,7 +44,7 @@ After building:
 PDF-To-Excel-Converter/
 ├── ConverterApp/
 │   └── dist/
-│       ├── PDF-To-Excel-Converter.exe
+│       ├── PDFtoExcelConverter.exe
 │   ├── templates/
 │   ├── static/
 │   ├── uploads/
