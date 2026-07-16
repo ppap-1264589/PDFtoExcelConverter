@@ -4,6 +4,7 @@
 ## Release Notes 16/07/2026:
 - Fixed several issues when writing Vietnamese text from PDF files to Excel and CSV.
 - Automatically removes unsupported or potentially problematic characters (such as null characters) from the converted output for improved compatibility.
+- Fixed duplicate log messages in the console
 
 # PDF to Excel Converter
 
