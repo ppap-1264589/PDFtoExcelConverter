@@ -23,7 +23,6 @@ env/
 build/
 dist/
 *.spec
-*.exe
 
 # Local scripts
 build.bat

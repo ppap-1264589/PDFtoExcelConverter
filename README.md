@@ -1,6 +1,11 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-# Latest Update v0.2.0-demo -> v0.2.0
+# Latest Update v0.2.0 -> v0.3.0
+## Release Notes 16/07/2026:
+- Fixed several issues when writing Vietnamese text from PDF files to Excel and CSV.
+- Automatically removes unsupported or potentially problematic characters (such as null characters) from the converted output for improved compatibility.
+
+
 ## Release Notes 25/06/2026:
 - Added Auto-shutdown when browser closes (heartbeat mechanism to auto-shutdown server when browser closes)
 - Added Multi-file upload with ZIP download
@@ -39,13 +44,22 @@ Users interact with the application by navigating to the main page, where they c
 
 ## Table of Contents
 
-- [Introduction](#introduction)
-- [Features](#features)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
-- [Acknowledgements](#acknowledgements)
+- [Latest Update v0.2.0 -\> v0.3.0](#latest-update-v020---v030)
+  - [Release Notes 16/07/2026:](#release-notes-16072026)
+  - [Release Notes 25/06/2026:](#release-notes-25062026)
+- [PDF to Excel Converter](#pdf-to-excel-converter)
+  - [Introduction](#introduction)
+- [](#)
+    - [All Text + Tables:](#all-text--tables)
+    - [Tables Only:](#tables-only)
+- [Design / UI / Screenshot](#design--ui--screenshot)
+  - [Table of Contents](#table-of-contents)
+  - [Features](#features)
+  - [Installation](#installation)
+  - [Usage](#usage)
+  - [Contributing](#contributing)
+  - [License](#license)
+  - [Acknowledgements](#acknowledgements)
 
 ## Features
 
