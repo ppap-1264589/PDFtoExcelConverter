@@ -1,0 +1,7 @@
+pdfplumber
+openpyxl
+Werkzeug
+Flask
+PyMuPDF
+pandas
+waitress
