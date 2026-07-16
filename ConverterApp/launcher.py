@@ -112,7 +112,7 @@ def main():
 
     threading.Thread(target=open_browser_when_ready, args=(url, port), daemon=True).start()
 
-    logger.info("Khởi động server tại %s", url)
+    logger.info("Starting server at %s", url)
     try:
         # waitress.serve() là production WSGI server thuần Python, không cần
         # compile C nên rất hợp để đóng gói bằng PyInstaller trên Windows.

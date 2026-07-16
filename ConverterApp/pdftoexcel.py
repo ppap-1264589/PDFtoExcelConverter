@@ -57,6 +57,7 @@ os.makedirs(LOG_FOLDER, exist_ok=True)
 
 logger = logging.getLogger('pdf_converter')
 logger.setLevel(logging.INFO)
+logger.propagate = False
 
 file_handler = RotatingFileHandler(
     os.path.join(LOG_FOLDER, 'app.log'),
