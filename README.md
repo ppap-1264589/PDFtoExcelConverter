@@ -5,20 +5,6 @@
 - Fixed several issues when writing Vietnamese text from PDF files to Excel and CSV.
 - Automatically removes unsupported or potentially problematic characters (such as null characters) from the converted output for improved compatibility.
 
-
-## Release Notes 25/06/2026:
-- Added Auto-shutdown when browser closes (heartbeat mechanism to auto-shutdown server when browser closes)
-- Added Multi-file upload with ZIP download
-- Added CSV and JSON export formats
-- Added Drag & drop file upload
-- Added Desktop [installer for Windows](https://github.com/TsvetanG2/PDF-To-Excel-Converter/releases/download/v0.2.0/PDF-To-Excel-Converter-Setup-0.2.0.exe)
-- Nested server loops fix
-- Bug fixes
-- Increased speed and added multi-threading + logging
-- Added Rate limiting (10 req/min per IP)
-- Added Dockerfile for containerization
-
-
 # PDF to Excel Converter
 
 ## Introduction
@@ -46,7 +32,6 @@ Users interact with the application by navigating to the main page, where they c
 
 - [Latest Update v0.2.0 -\> v0.3.0](#latest-update-v020---v030)
   - [Release Notes 16/07/2026:](#release-notes-16072026)
-  - [Release Notes 25/06/2026:](#release-notes-25062026)
 - [PDF to Excel Converter](#pdf-to-excel-converter)
   - [Introduction](#introduction)
 - [](#)
@@ -57,8 +42,6 @@ Users interact with the application by navigating to the main page, where they c
   - [Features](#features)
   - [Installation](#installation)
   - [Usage](#usage)
-  - [Contributing](#contributing)
-  - [License](#license)
   - [Acknowledgements](#acknowledgements)
 
 ## Features
@@ -74,7 +57,7 @@ Users interact with the application by navigating to the main page, where they c
 1. Clone the repository:
 
     ```bash
-    git clone https://github.com/TsvetanG2/pdf-to-excel-converter.git
+    git clone https://github.com/ppap-1264589/PDFtoExcelConverter.git
     ```
 
 2. Navigate to the project directory:
@@ -109,29 +92,8 @@ Users interact with the application by navigating to the main page, where they c
 
 6. Download the generated Excel file.
 
-## Contributing
-
-Contributions are welcome! Please follow these steps to contribute:
-
-1. Fork the repository.
-2. Create a new branch (`git checkout -b feature/yourfeature`).
-3. Make your changes.
-4. Commit your changes (`git commit -am 'Add new feature'`).
-5. Push to the branch (`git push origin feature/yourfeature`).
-6. Create a new Pull Request.
-
-- **Documentation**: [docs/](docs/) folder
-- **Bug Reports**: [GitHub Issues](https://github.com/TsvetanG2/PDF-To-Excel-Converter/issues)
-- **Feature Requests**: [GitHub Discussions](https://github.com/TsvetanG2/PDF-To-Excel-Converter/discussions)
-- **Show Support**: Star the repository if you find it useful!
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](https://opensource.org/license/MIT) file for details.
-
 ## Acknowledgements
 
 - [pdfplumber](https://github.com/jsvine/pdfplumber)
-- [tabula-py](https://github.com/chezou/tabula-py)
 - [Flask](https://flask.palletsprojects.com/)
 
