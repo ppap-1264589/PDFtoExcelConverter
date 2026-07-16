@@ -41,8 +41,9 @@ Users interact with the application by navigating to the main page, where they c
 - [Design / UI / Screenshot](#design--ui--screenshot)
   - [Table of Contents](#table-of-contents)
   - [Features](#features)
-  - [Installation](#installation)
-  - [Usage](#usage)
+  - [Installation for users:](#installation-for-users)
+  - [Installation for developers:](#installation-for-developers)
+    - [Usage](#usage)
   - [Acknowledgements](#acknowledgements)
 
 ## Features
@@ -53,7 +54,12 @@ Users interact with the application by navigating to the main page, where they c
 - Supports multiple processing options for different user needs.
 - Well-structured codebase for easy customization and extension.
 
-## Installation
+
+## Installation for users:
+
+You can download the ready-to-use executable file in latest [releases](https://github.com/ppap-1264589/PDFtoExcelConverter/releases)
+
+## Installation for developers:
 
 1. Clone the repository:
 
@@ -64,7 +70,7 @@ Users interact with the application by navigating to the main page, where they c
 2. Navigate to the project directory:
 
     ```bash
-    cd pdf-to-excel-converter
+    cd PDFtoExcelConverter/ConverterApp
     ```
 
 3. Install dependencies:
@@ -73,7 +79,7 @@ Users interact with the application by navigating to the main page, where they c
     pip install -r requirements.txt
     ```
 
-## Usage
+### Usage
 
 1. Start the Flask server:
 
