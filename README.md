@@ -101,6 +101,7 @@ You can download the ready-to-use executable file in latest [releases](https://g
 
 ## Acknowledgements
 
+- [Previous version by TsvetanG2](https://github.com/TsvetanG2/PDF-To-Excel-Converter)
 - [pdfplumber](https://github.com/jsvine/pdfplumber)
 - [Flask](https://flask.palletsprojects.com/)
 
