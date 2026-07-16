@@ -103,5 +103,6 @@ You can download the ready-to-use executable file in latest [releases](https://g
 
 - [Previous version by TsvetanG2](https://github.com/TsvetanG2/PDF-To-Excel-Converter)
 - [pdfplumber](https://github.com/jsvine/pdfplumber)
+- [pymupdf](https://github.com/pymupdf/pymupdf)
 - [Flask](https://flask.palletsprojects.com/)
 
