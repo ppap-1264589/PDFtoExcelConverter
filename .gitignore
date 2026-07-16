@@ -23,6 +23,7 @@ env/
 build/
 dist/
 *.spec
+*.requirements_hash
 
 # Local scripts
 build.bat

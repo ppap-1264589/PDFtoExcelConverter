@@ -183,10 +183,20 @@ def _extract_tables_with_fitz(pdf, fdoc):
 
 
 def extract_pdf_content(pdf_path):
-    """Extract text and tables from PDF (dùng cho chế độ 'allText')."""
+    """
+    Extract text and tables from PDF (dùng cho chế độ 'allText').
+
+    Trả về list theo TỪNG TRANG: [{'text': str, 'tables': [...]}, ...].
+    Trước đây hàm này đổ text của mọi trang vào 1 list phẳng và bảng của
+    mọi trang vào 1 list phẳng khác, nên ranh giới "trang nào có gì" bị
+    mất ngay từ bước trích xuất -> khi ghi ra Excel/CSV/JSON, toàn bộ text
+    bị dồn lên đầu, toàn bộ bảng bị dồn xuống cuối, không còn đúng thứ tự
+    trang 1 -> trang 2 -> ... như trong PDF gốc. Giữ cấu trúc theo trang ở
+    đây để các hàm ghi file phía sau (create_excel/create_csv/create_json)
+    có thể ghi tuần tự text-trang-1, bảng-trang-1, text-trang-2, ...
+    """
     logger.info(f"Extracting content from: {pdf_path}")
-    text_lines = []
-    table_data = []
+    pages_content = []
 
     try:
         with pdfplumber.open(pdf_path) as pdf, fitz.open(pdf_path) as fdoc:
@@ -195,9 +205,9 @@ def extract_pdf_content(pdf_path):
             for page_num, page in enumerate(pdf.pages):
                 fpage = fdoc[page_num]
                 page_tables, table_bboxes = tables_per_page[page_num]
-                table_data.extend(page_tables)
 
                 # Lấy chữ ngoài bảng bằng fitz, bỏ qua block nằm trong vùng bảng
+                text_lines = []
                 for block in fpage.get_text("blocks"):
                     x0, y0, x1, y1, text = block[0], block[1], block[2], block[3], block[4]
                     inside_table = any(
@@ -209,13 +219,22 @@ def extract_pdf_content(pdf_path):
                         if cleaned:
                             text_lines.append(_norm_text(cleaned))
 
-        text_content = "\n".join(text_lines)
-        logger.info(f"Extracted {len(text_content)} chars and {len(table_data)} tables")
+                pages_content.append({
+                    'text': "\n".join(text_lines),
+                    'tables': page_tables,
+                })
+
+        total_chars = sum(len(p['text']) for p in pages_content)
+        total_tables = sum(len(p['tables']) for p in pages_content)
+        logger.info(
+            f"Extracted {total_chars} chars and {total_tables} tables "
+            f"across {len(pages_content)} pages"
+        )
     except Exception as e:
         logger.error(f"Error extracting content from {pdf_path}: {str(e)}")
         raise
 
-    return text_content, table_data
+    return pages_content
 
 
 def extract_tables_from_pdf(pdf_path):
@@ -256,37 +275,36 @@ def extract_tables_from_pdf(pdf_path):
     return all_tables
 
 
-def create_excel(text_content, table_data):
+def create_excel(pages_content):
     """
-    Create Excel workbook from text and table data.
+    Create Excel workbook from page-structured data (xem extract_pdf_content).
 
-    Lưu ý: extract_pdf_content() đã tự tách bạch text_content (chữ ngoài
-    bảng) và table_data (chữ trong bảng) ngay từ khâu trích xuất bằng fitz,
-    nên ở đây KHÔNG cần dò tìm dòng text nào "trùng khớp" với bảng như bản
-    gốc của tác giả (cách đó dựa vào việc pdfminer trộn lẫn text và bảng
-    vào chung một luồng). Chỉ cần ghi text trước, rồi ghi các bảng nối
-    tiếp phía sau.
+    Ghi tuần tự theo từng trang PDF: text của trang -> các bảng của trang
+    đó -> sang trang tiếp theo. Giữ đúng thứ tự trang 1 -> trang 2 -> ...
+    thay vì dồn hết text lên đầu rồi dồn hết bảng xuống cuối như trước.
     """
     logger.info("Creating Excel workbook")
     wb = Workbook()
     ws = wb.active
     ws.title = "PDF Content"
 
-    ws['A1'] = ""
-    text_lines = text_content.split('\n') if text_content else []
-    current_row = 2
-    for line in text_lines:
-        ws.cell(row=current_row, column=1, value=clean_text(line))
-        current_row += 1
+    current_row = 1
+    for page in pages_content:
+        text_lines = page['text'].split('\n') if page['text'] else []
+        for line in text_lines:
+            ws.cell(row=current_row, column=1, value=clean_text(line))
+            current_row += 1
 
-    if table_data:
-        current_row += 1  # dòng trống ngăn cách text và bảng
+        if page['tables']:
+            current_row += 1  # dòng trống ngăn cách text và bảng trong cùng trang
 
-    for table in table_data:
-        for row_index, row_data in enumerate(table, start=current_row):
-            for col_index, value in enumerate(row_data, start=2):  # bắt đầu từ cột B
-                ws.cell(row=row_index, column=col_index, value=clean_text(value))
-        current_row += len(table) + 2  # khoảng cách giữa các bảng
+        for table in page['tables']:
+            for row_index, row_data in enumerate(table, start=current_row):
+                for col_index, value in enumerate(row_data, start=2):  # bắt đầu từ cột B
+                    ws.cell(row=row_index, column=col_index, value=clean_text(value))
+            current_row += len(table) + 2  # khoảng cách giữa các bảng cùng trang
+
+        current_row += 1  # dòng trống ngăn cách giữa các trang PDF
 
     # Apply font to maintain formatting
     for row in ws.iter_rows():
@@ -339,43 +357,44 @@ def write_tables_to_excel(tables, excel_path):
     logger.info(f"Excel file saved: {excel_path}")
 
 
-def create_csv(text_content, table_data, output_path):
-    """Create CSV from extracted data."""
+def create_csv(pages_content, output_path):
+    """Create CSV from page-structured data (xem extract_pdf_content), giữ đúng thứ tự trang."""
     logger.info(f"Creating CSV: {output_path}")
     all_data = []
 
-    if text_content:
-        for line in text_content.split('\n'):
-            if line.strip():
-                all_data.append([line.strip()])
-
-    for table in table_data:
-        for row in table:
-            if row:
-                all_data.append([str(cell) if cell else '' for cell in row])
+    for page in pages_content:
+        if page['text']:
+            for line in page['text'].split('\n'):
+                if line.strip():
+                    all_data.append([line.strip()])
+        for table in page['tables']:
+            for row in table:
+                if row:
+                    all_data.append([str(cell) if cell else '' for cell in row])
 
     df = pd.DataFrame(all_data)
     df.to_csv(output_path, index=False, header=False, encoding='utf-8-sig')
     logger.info(f"CSV file saved: {output_path}")
 
 
-def create_json(text_content, table_data, output_path):
-    """Create JSON from extracted data."""
+def create_json(pages_content, output_path):
+    """Create JSON from page-structured data (xem extract_pdf_content), giữ đúng thứ tự trang."""
     logger.info(f"Creating JSON: {output_path}")
-    result = {
-        'text': text_content.split('\n') if text_content else [],
-        'tables': []
-    }
+    result = {'pages': []}
 
-    for i, table in enumerate(table_data):
-        table_dict = {
-            'table_number': i + 1,
-            'rows': []
+    for page_num, page in enumerate(pages_content, start=1):
+        page_dict = {
+            'page': page_num,
+            'text': page['text'].split('\n') if page['text'] else [],
+            'tables': []
         }
-        for row in table:
-            if row:
-                table_dict['rows'].append([str(cell) if cell else '' for cell in row])
-        result['tables'].append(table_dict)
+        for i, table in enumerate(page['tables'], start=1):
+            table_dict = {'table_number': i, 'rows': []}
+            for row in table:
+                if row:
+                    table_dict['rows'].append([str(cell) if cell else '' for cell in row])
+            page_dict['tables'].append(table_dict)
+        result['pages'].append(page_dict)
 
     with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
@@ -449,27 +468,28 @@ def upload():
             output_path = os.path.join(app.config['UPLOAD_FOLDER'], f"{unique_id}_{output_filename}")
 
             if processing_option == 'allText':
-                text_content, table_data = extract_pdf_content(pdf_filepath)
+                pages_content = extract_pdf_content(pdf_filepath)
 
-                # PDF dạng scan/ảnh (không có lớp text) sẽ cho ra text_content
-                # và table_data đều rỗng. Trước đây code vẫn tạo ra 1 file
+                # PDF dạng scan/ảnh (không có lớp text) sẽ cho ra mọi trang đều
+                # rỗng cả text lẫn tables. Trước đây code vẫn tạo ra 1 file
                 # Excel/CSV/JSON hợp lệ nhưng trống trơn mà không báo gì, khiến
                 # người dùng tưởng convert thành công. Giờ bỏ qua file này và
                 # cảnh báo, giống hệt cách xử lý của chế độ 'tablesOnly'.
-                if not text_content and not table_data:
+                has_content = any(p['text'] or p['tables'] for p in pages_content)
+                if not has_content:
                     logger.warning(
                         f"No extractable text/tables in {original_filename} "
-                        "(có thể là PDF dạng scan/ảnh, cần OCR)"
+                        "(if PDF is image, OCR is needed) - skipping file"
                     )
                     continue
 
                 if output_format == 'xlsx':
-                    excel_file = create_excel(text_content, table_data)
+                    excel_file = create_excel(pages_content)
                     excel_file.save(output_path)
                 elif output_format == 'csv':
-                    create_csv(text_content, table_data, output_path)
+                    create_csv(pages_content, output_path)
                 elif output_format == 'json':
-                    create_json(text_content, table_data, output_path)
+                    create_json(pages_content, output_path)
 
             elif processing_option == 'tablesOnly':
                 tables = extract_tables_from_pdf(pdf_filepath)
