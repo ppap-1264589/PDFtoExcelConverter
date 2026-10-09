@@ -448,10 +448,12 @@ def upload():
     ext_map = {'xlsx': '.xlsx', 'csv': '.csv', 'json': '.json'}
     output_ext = ext_map.get(output_format, '.xlsx')
 
-    try:
-        output_files = []
-        temp_pdf_files = []
+    output_files = []
+    temp_pdf_files = []
+    zip_path = None
+    keep_download_files = False
 
+    try:
         for file in valid_files:
             # Save PDF with unique prefix to avoid conflicts
             original_filename = secure_filename(file.filename)
@@ -522,9 +524,6 @@ def upload():
             if os.path.exists(output_path):
                 output_files.append((output_path, output_filename))
 
-        # Clean up PDF files
-        delete_files(*temp_pdf_files)
-
         if not output_files:
             return jsonify({'error': 'No files were converted successfully'}), 400
 
@@ -537,14 +536,18 @@ def upload():
                 download_name=output_filename
             )
 
-            @response.call_on_close
-            def cleanup():
-                delete_files(output_path)
+            keep_download_files = True
+            response.call_on_close(lambda: delete_files(output_path))
 
             return response
 
         # Multiple files - create ZIP
-        zip_filename = f"converted_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip"
+        # A per-request identifier prevents simultaneous conversions from
+        # writing to the same ZIP path, even when they start in the same second.
+        zip_filename = (
+            f"converted_{datetime.now().strftime('%Y%m%d_%H%M%S')}_"
+            f"{uuid.uuid4().hex}.zip"
+        )
         zip_path = os.path.join(app.config['UPLOAD_FOLDER'], zip_filename)
 
         # Nếu nhiều PDF có cùng tên gốc, output_filename sẽ trùng nhau và
@@ -570,15 +573,21 @@ def upload():
 
         response = send_file(zip_path, as_attachment=True, download_name=zip_filename)
 
-        @response.call_on_close
-        def cleanup():
-            delete_files(zip_path)
+        keep_download_files = True
+        response.call_on_close(lambda: delete_files(zip_path))
 
         return response
 
     except Exception as e:
         logger.error(f"Error processing upload from {client_ip}: {str(e)}")
         return jsonify({'error': f'Processing error: {str(e)}'}), 500
+    finally:
+        # Always remove uploaded PDFs. Keep generated downloads only after
+        # ownership has been transferred to the response close callback.
+        delete_files(*temp_pdf_files)
+        if not keep_download_files:
+            delete_files(*(path for path, _ in output_files))
+            delete_files(zip_path)
 
 
 @app.route('/health')
