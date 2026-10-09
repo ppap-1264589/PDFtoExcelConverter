@@ -1,7 +1,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 # Latest Update v0.3.0 -> v0.3.1
-## Release Notes 09/09/2026: v0.3.1
+## Release Notes 09/10/2026: v0.3.1
 - Fixed several issues when writing Vietnamese text from PDF files to Excel and CSV.
 - Automatically removes unsupported or potentially problematic characters (such as null characters) from the converted output for improved compatibility.
 - Fixed duplicate log messages in the console
