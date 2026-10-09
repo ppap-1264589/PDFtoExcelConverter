@@ -35,7 +35,8 @@ ConverterApp/logs/
 ConverterApp/uploads/
 
 # Installer output
-ConverterApp/For Desktop/
+ConverterApp For Desktop
+ConverterApp For Desktop/.exe
 
 # Docker (optional - remove if you want to track)
 # Dockerfile
