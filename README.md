@@ -33,7 +33,7 @@ Users interact with the application by navigating to the main page, where they c
 ## Table of Contents
 
 - [Latest Update v0.3.0 -\> v0.3.1](#latest-update-v030---v031)
-  - [Release Notes 16/07/2026: v0.3.1](#release-notes-16072026-v031)
+  - [Release Notes 09/10/2026: v0.3.1](#release-notes-16072026-v031)
 - [PDF to Excel Converter](#pdf-to-excel-converter)
   - [Introduction](#introduction)
 - [](#)
