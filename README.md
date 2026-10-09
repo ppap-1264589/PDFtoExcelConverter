@@ -11,7 +11,7 @@
 
 ## Introduction
 
-<img width="754" height="631" alt="download" src="https://github.com/user-attachments/assets/146f145a-5bd7-45b8-9831-c300a0210c52" />
+<img width="1248" height="622" alt="system" src="https://github.com/user-attachments/assets/118b0e61-bf36-4efd-bc90-3cc092d03fb4"/>
 
 #
 
@@ -25,6 +25,16 @@ This mode extracts all textual content and tabular data from the PDF and consoli
 This mode focuses exclusively on identifying and extracting tabular data from the PDF. Each detected table is then organized into a separate sheet within the generated Excel workbook. This is particularly useful for PDFs where structured data in tables is the main interest.
 Users interact with the application by navigating to the main page, where they can upload a PDF file and choose their preferred extraction mode. Upon submission, the application processes the PDF, extracts the relevant content, generates an Excel file, and then offers it for download. The web application handles the file upload, initiates the conversion process, and manages the delivery of the final Excel output. The overall architecture is built around a Flask web application, which orchestrates these operations. For more details on the web application's structure and workflow, see Flask Application Structure and Workflow.
 
+# Architectural details
+
+The application uses Flask to provide a local web interface for uploading PDF files and downloading converted results.
+
+For PDF processing, `pdfplumber` detects table structures and cell boundaries, while PyMuPDF (imported as `fitz`) extracts text from the document and detected cells. `pandas` organizes table data, and `openpyxl` creates Excel workbooks. CSV and JSON files are generated using `pandas` and Python’s built-in `json` module.
+
+The desktop launcher runs the Flask application with Waitress. When multiple files are converted, the application packages the results into a ZIP archive. The project does not use Tabula-py and does not currently perform OCR on scanned PDFs.
+
+<img width="1683" height="530" alt="system details" src="https://github.com/user-attachments/assets/9d616c1a-fd21-4a8e-8345-d180943b303f" />
+
 # Design / UI / Screenshot
 
 <img width="690" height="700" alt="Screenshot 2026-07-04 030341" src="https://github.com/user-attachments/assets/783f7315-92e6-4288-ba89-385175bec40f" />
@@ -32,20 +42,17 @@ Users interact with the application by navigating to the main page, where they c
 
 ## Table of Contents
 
-- [Latest Update v0.3.0 -\> v0.3.1](#latest-update-v030---v031)
-  - [Release Notes 09/10/2026: v0.3.1](#release-notes-16072026-v031)
+- [Latest Update v0.3.0 → v0.3.1](#latest-update-v030---v031)
+  - [Release Notes 09/10/2026: v0.3.1](#release-notes-09102026-v031)
 - [PDF to Excel Converter](#pdf-to-excel-converter)
   - [Introduction](#introduction)
-- [](#)
-    - [All Text + Tables:](#all-text--tables)
-    - [Tables Only:](#tables-only)
+  - [Architectural Details](#architectural-details)
 - [Design / UI / Screenshot](#design--ui--screenshot)
-  - [Table of Contents](#table-of-contents)
-  - [Features](#features)
-  - [Installation for users:](#installation-for-users)
-  - [Installation for developers:](#installation-for-developers)
-    - [Usage](#usage)
-  - [Acknowledgements](#acknowledgements)
+- [Features](#features)
+- [Installation for users](#installation-for-users)
+- [Installation for developers](#installation-for-developers)
+  - [Usage](#usage)
+- [Acknowledgements](#acknowledgements)
 
 ## Features
 
